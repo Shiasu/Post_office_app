@@ -1,0 +1,69 @@
+﻿<div>
+    <h1>Почтовый офис</h1>
+    <p class="text-info">Перед началом работы пожалуйста дождитесь загрузки предварительных данных.</p>
+    <p class="text-info">Из-за загрузки предварительных данных через конструктор контроллера ожидание может занять 30-60 секунд.</p>
+    <p class="text-info">Об изменении статуса посылки сервер не информирует клиент, в связи с этим включено автообновление страницы каждые 30 секунд.</p>
+    <p class="text-info">Дополнительно для удобства добавлена кнопка удаления посылки.</p>
+</div>
+<hr/>
+<h2>Список посылок</h2>
+<input type="button" value="Сформировать посылку" class="btn btn-default" (click)="add()"/>
+<hr>
+<p><strong>Фильтр по статусу</strong></p>
+<select (change)="selectChangedHandler($event)">
+    <option value="all">Без фильтра</option>
+    <option value="sorting">В сортировочном центре</option>
+    <option value="sent">Отправлено</option>
+    <option value="delivered">Доставлено</option>
+    <option value="received">Получено</option>
+</select>
+<table *ngIf="tableMode; else create" class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <td>Номер</td>
+            <td>Отправитель</td>
+            <td>Получатель</td>
+            <td>Статус</td>
+            <td>Дата добавления</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="parcelRow" *ngFor="let p of parcels">
+            <td>{{p?.parcelNumber}}</td>
+            <td>{{p?.addresser}}</td>
+            <td>{{p?.addressee}}</td>
+            <td>{{p?.status | statuses}}</td>
+            <td>{{p?.date | date: 'M/d/yy, h:mm a'}}</td>
+            <td>
+                <button class="btn btn-sm btn-danger" (click)="delete(p)">Удалить</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!--шаблон для добавления-->
+<ng-template #create>
+    <div class="form-group">
+        <label>Номер</label>
+        <input readonly type="number" [value]="parcel.parcelNumber" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Отправитель</label>
+        <input type="text" name="addresser" [(ngModel)]="parcel.Addresser" class="form-control" #addresser="ngModel" required/>
+        <div [hidden]="addresser.valid || addresser.untouched" class="alert alert-danger">
+            Не указан отправитель
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Получатель</label>
+        <input type="text" name="addressee" [(ngModel)]="parcel.Addressee" class="form-control" #addressee="ngModel" required/>
+        <div [hidden]="addressee.valid || addressee.untouched" class="alert alert-danger">
+            Не указан получатель
+        </div>
+    </div>
+    <div>
+        <input type="submit" value="Сохранить" [disabled]="addresser.invalid || addressee.invalid"  (click)="save()" class="btn btn-success" />
+        <input type="button" value="Отмена" (click)="cancel()" class="btn btn-warning" />
+    </div>
+</ng-template>
